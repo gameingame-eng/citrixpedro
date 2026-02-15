@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import com.pedropathing.follower.Follower;
@@ -15,62 +14,48 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.Dash.DashboardDrawingHandler;
 
-@Autonomous(name = "RedGoal1fjfbbkjf2BallAuto", group = "Autonomous")
+@Autonomous(name = "BlueGoalCorrectedDirection", group = "Autonomous")
 public class testingg extends LinearOpMode {
 
     private Follower follower;
     private ElapsedTime timer = new ElapsedTime();
     private int pathState;
 
-    // Hardware variables
     private DcMotorEx shooterMotor;
     private DcMotor intakeMotor;
-    private DcMotor leftFrontDrive;
-    private DcMotor rightFrontDrive;
-    private DcMotor leftBackDrive;
-    private DcMotor rightBackDrive;
     private CRServo leftFeeder;
     private CRServo rightFeeder;
 
-    // Define Poses (X, Y, Heading)
-    private final Pose startPose = new Pose(8, 56, Math.toRadians(0));
-    private final Pose scorePose = new Pose(30, 56, Math.toRadians(0));
+    // --- ADJUSTED POSES ---
+    // If 35 was too far, 10-12 is usually "Up Close" against the wall.
+    // Facing the goal usually means Heading is 0.
+    private final Pose scorePose = new Pose(10, 114, Math.toRadians(0));
 
-    private Path scorePath;
+    // To move BACK: We increase X (Move toward the center of the field)
+    // To move RIGHT: We decrease Y (Move toward the center of the field)
+    private final Pose endPose = new Pose(35, 80, Math.toRadians(0));
+
+    private Path moveBackRight;
 
     @Override
     public void runOpMode() {
-        // Initialize Pedro Pathing
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);
-
-        // Initialize Hardware using names from bobot.xml
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFront");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "leftRear");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
+        follower.setStartingPose(scorePose);
 
         shooterMotor = hardwareMap.get(DcMotorEx.class, "launcher");
         intakeMotor = hardwareMap.get(DcMotor.class, "intake");
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
 
-        // Set Directions: Reverse the left side so positive power moves forward
-        leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        // Single diagonal line move
+        moveBackRight = new Path(new BezierLine(scorePose, endPose));
+        moveBackRight.setConstantHeadingInterpolation(Math.toRadians(0));
 
-        // Build the path to the goal
-        scorePath = new Path(new BezierLine(startPose, scorePose));
-        scorePath.setConstantHeadingInterpolation(Math.toRadians(0));
-
-        // Wait for Start
         while (!isStarted() && !isStopRequested()) {
             follower.update();
-            telemetry.addData("Status", "Initialized - Check Config Names");
+            telemetry.addLine("Ready - Blue Goal Up Close");
             telemetry.update();
         }
-
-        if (isStopRequested()) return;
 
         pathState = 0;
         timer.reset();
@@ -79,7 +64,10 @@ public class testingg extends LinearOpMode {
             follower.update();
             autonomousControl();
 
-            // Dashboard and Telemetry
+            if (pathState == 2 && !follower.isBusy()) {
+                follower.breakFollowing();
+            }
+
             DashboardDrawingHandler.drawDebug(follower);
             telemetry.addData("Path State", pathState);
             telemetry.addData("X", follower.getPose().getX());
@@ -90,39 +78,33 @@ public class testingg extends LinearOpMode {
 
     public void autonomousControl() {
         switch (pathState) {
-            case 0: // Move to Goal
-                follower.followPath(scorePath);
-                setPathState(1);
-                break;
-
-            case 1: // Wait until robot reaches the goal
-                if (!follower.isBusy()) {
-                    timer.reset();
-                    setPathState(2);
+            case 0: // Shoot 3 Balls
+                shooterMotor.setPower(0.9);
+                if (timer.seconds() > 0.8) { // Slightly longer spinup
+                    intakeMotor.setPower(0.9);
+                    leftFeeder.setPower(1.0);
+                    rightFeeder.setPower(-1.0);
                 }
-                break;
 
-            case 2: // Shooting Logic
-                // Activate launcher and feed mechanisms
-                shooterMotor.setPower(1.0);
-                intakeMotor.setPower(0.8);
-
-                // CRServos usually need opposite powers to spin in the same direction relative to the intake
-                leftFeeder.setPower(1.0);
-                rightFeeder.setPower(-1.0);
-
-                // Wait 4 seconds to ensure all balls are shot
-                if (timer.seconds() > 4.0) {
+                if (timer.seconds() > 4.5) { // Give it plenty of time
                     shooterMotor.setPower(0);
                     intakeMotor.setPower(0);
                     leftFeeder.setPower(0);
                     rightFeeder.setPower(0);
-                    setPathState(3);
+
+                    follower.followPath(moveBackRight);
+                    setPathState(1);
                 }
                 break;
 
-            case 3: // Done
-                telemetry.addData("Auto Status", "Complete");
+            case 1: // Wait for move
+                if (!follower.isBusy()) {
+                    setPathState(2);
+                }
+                break;
+
+            case 2:
+                telemetry.addLine("Autonomous Complete");
                 break;
         }
     }

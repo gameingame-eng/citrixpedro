@@ -55,9 +55,6 @@ public class twelveball extends LinearOpMode {
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
 
-        // Set Directions: Reverse the left side so positive power moves forward
-        leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Build the path to the goal
         scorePath = new Path(new BezierLine(startPose, scorePose));

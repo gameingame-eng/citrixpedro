@@ -3,34 +3,42 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
+import com.pedropathing.ftc.drivetrains.MecanumConstants;
+import com.pedropathing.ftc.localization.Encoder;
+import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
-import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Constants {
+    public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
+            .rightFrontMotorName("rightFront")
+            .rightRearMotorName("rightRear")
+            .leftRearMotorName("leftRear")
+            .leftFrontMotorName("leftFront")
+            .leftFrontEncoderDirection(Encoder.FORWARD)
+            .leftRearEncoderDirection(Encoder.FORWARD)
+            .rightFrontEncoderDirection(Encoder.FORWARD)
+            .rightRearEncoderDirection(Encoder.FORWARD);
     public static FollowerConstants followerConstants = new FollowerConstants();
-
-    // Initialize the object first, then call setters individually
-    public static MecanumConstants driveConstants = new MecanumConstants();
-
-    static {
-        driveConstants.setLeftFrontMotorName("leftFront");
-        driveConstants.setRightFrontMotorName("rightFront");
-        driveConstants.setLeftRearMotorName("leftRear");
-        driveConstants.setRightRearMotorName("rightRear");
-        driveConstants.setLeftFrontMotorDirection(DcMotorSimple.Direction.REVERSE);
-        driveConstants.setLeftRearMotorDirection(DcMotorSimple.Direction.REVERSE);
-    }
-
+            // .mass()
+            public static MecanumConstants driveConstants = new MecanumConstants()
+                    .maxPower(1)
+                    .rightFrontMotorName("rightFront")
+                    .rightRearMotorName("rightRear")
+                    .leftRearMotorName("leftRear")
+                    .leftFrontMotorName("leftFront")
+                    .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+                    .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+                    .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+                    .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)
+                .driveEncoderLocalizer(localizerConstants)
                 .mecanumDrivetrain(driveConstants)
-                .driveEncoderLocalizer(new DriveEncoderConstants())
                 .build();
     }
 }
