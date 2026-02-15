@@ -70,8 +70,8 @@ public class Onbot extends OpMode {
      * velocity. Here we are setting the target, and minimum velocity that the launcher should run
      * at. The minimum velocity is a threshold for determining when to fire.
      */
-    final double LAUNCHER_TARGET_VELOCITY = 1125;
-    final double LAUNCHER_MIN_VELOCITY = 1025;
+    final double LAUNCHER_TARGET_VELOCITY = 1500;
+    final double LAUNCHER_MIN_VELOCITY = 1400;
 
     // Declare OpMode members.
     private DcMotor leftFrontDrive = null;
@@ -253,7 +253,7 @@ public class Onbot extends OpMode {
          * both motors work to rotate the robot. Combinations of these inputs can be used to create
          * more complex maneuvers.
          */
-        double forward = 2.75;
+        double forward = 1;
         mecanumDrive(-gamepad1.left_stick_y * forward, gamepad1.left_stick_x * forward, gamepad1.right_stick_x * forward);
 
         /*
@@ -334,11 +334,30 @@ public class Onbot extends OpMode {
                 }
                 break;
             case LAUNCH:
-                leftFeeder.setPower(FULL_SPEED);
-                rightFeeder.setPower(FULL_SPEED);
-                feederTimer.reset();
-                launchState = LaunchState.LAUNCHING;
-                break;
+                if (gamepad1.a) { // Replace with your specific button
+                    for (int i = 0; i < 3; i++) {
+                        // --- 1. SPIN START ---
+                        leftFeeder.setPower(FULL_SPEED);
+                        rightFeeder.setPower(FULL_SPEED);
+
+                        feederTimer.reset();
+                        while (feederTimer.milliseconds() < 400) {
+                            // Force the robot to wait here
+                        }
+
+                        // --- 2. SPIN STOP ---
+                        // We MUST stop the motors so the next ball can fall into place
+                        leftFeeder.setPower(0);
+                        rightFeeder.setPower(0);
+
+                        feederTimer.reset();
+                        while (feederTimer.milliseconds() < 200) {
+                            // Small gap to let the mechanism settle
+                        }
+                    }
+                    // Only move to the next state AFTER the loop finishes
+                    launchState = LaunchState.LAUNCHING;
+                }
             case LAUNCHING:
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
                     launchState = LaunchState.IDLE;
