@@ -40,27 +40,18 @@ public class twelveball extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Initialize Pedro Pathing
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
-
-        // Initialize Hardware using names from bobot.xml
         leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFront");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftRear");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
-
         shooterMotor = hardwareMap.get(DcMotorEx.class, "launcher");
         intakeMotor = hardwareMap.get(DcMotor.class, "intake");
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
-
-
-        // Build the path to the goal
         scorePath = new Path(new BezierLine(startPose, scorePose));
         scorePath.setConstantHeadingInterpolation(Math.toRadians(0));
-
-        // Wait for Start
         while (!isStarted() && !isStopRequested()) {
             follower.update();
             telemetry.addData("Status", "Initialized - Check Config Names");

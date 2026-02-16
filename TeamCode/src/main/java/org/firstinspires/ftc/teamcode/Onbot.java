@@ -80,7 +80,7 @@ public class Onbot extends OpMode {
     private boolean Outtake = false;
     private boolean prevIntakeButtonX = false;
     private boolean prevOutTakeButtonA = false;
-    final double INTAKE_POWER = 0.6;
+    final double INTAKE_POWER = 1;
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;

@@ -70,8 +70,8 @@ public class teleop extends OpMode {
      * velocity. Here we are setting the target, and minimum velocity that the launcher should run
      * at. The minimum velocity is a threshold for determining when to fire.
      */
-    final double LAUNCHER_TARGET_VELOCITY = 1100;
-    final double LAUNCHER_MIN_VELOCITY = 1000;
+    final double LAUNCHER_TARGET_VELOCITY = 1500;
+    final double LAUNCHER_MIN_VELOCITY = 1400;
 
     // Declare OpMode members.
     private DcMotor leftFrontDrive = null;
@@ -80,7 +80,7 @@ public class teleop extends OpMode {
     private boolean Outtake = false;
     private boolean prevIntakeButtonX = false;
     private boolean prevOutTakeButtonA = false;
-    final double INTAKE_POWER = 0.6;
+    final double INTAKE_POWER = 0.85;
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
@@ -335,14 +335,14 @@ public class teleop extends OpMode {
                 }
                 break;
             case LAUNCH:
-                if (shotsFired < 3) {
+                if (shotsFired <= 3) {
                     double elapsed = feederTimer.milliseconds();
 
-                    if (elapsed < 400) {
+                    if (elapsed < 300) {
                         // Phase 1: Extend feeder/Push ball
                         leftFeeder.setPower(FULL_SPEED);
                         rightFeeder.setPower(FULL_SPEED);
-                    } else if (elapsed < 700) {
+                    } else if (elapsed < 600) {
                         // Phase 2: Retract feeder/Wait for next ball
                         leftFeeder.setPower(STOP_SPEED);
                         rightFeeder.setPower(STOP_SPEED);
@@ -354,6 +354,7 @@ public class teleop extends OpMode {
                 } else {
                     // All 3 shots done
                     launchState = LaunchState.IDLE;
+                    shotsFired = 0;
                 }
                 break;
             case LAUNCHING:
