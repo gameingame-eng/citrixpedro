@@ -34,6 +34,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
+import static org.firstinspires.ftc.teamcode.teleop.LaunchState.LAUNCHING;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -87,6 +89,7 @@ public class teleop extends OpMode {
     private CRServo leftFeeder = null;
     private CRServo rightFeeder = null;
     private DcMotor intake = null;
+    private DcMotorEx intakeFlywheel = null;
     private int shotsFired = 0;
 
     ElapsedTime feederTimer = new ElapsedTime();
@@ -142,7 +145,7 @@ public class teleop extends OpMode {
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        intakeFlywheel = hardwareMap.get(DcMotor.class, "wheelIntake")
+        //intakeFlywheel = hardwareMap.get(DcMotorEx.class, "wheelIntake");
 
         /*
          * To drive forward, most robots need the motor on one side to be reversed,
@@ -266,7 +269,7 @@ public class teleop extends OpMode {
         } else if (gamepad1.b) { // stop flywheel
             launcher.setVelocity(0);
         }
-        elif (gamepad1.left_stick_button) {
+        else if (gamepad1.left_stick_button) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
         /*
@@ -325,24 +328,24 @@ public class teleop extends OpMode {
         switch (launchState) {
             case IDLE:
                 if (shotRequested) {
-                    shotsFired = 0
+                    shotsFired = 0;
                     launchState = LaunchState.SPIN_UP;
                 }
                 break;
             case SPIN_UP:
                 launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
                 if (launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
-                    feederTimer.reset()
+                    feederTimer.reset();
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
             case LAUNCH:
-<<<<<<< HEAD
+
                 if (shotsFired <= 3) {
-=======
+
 
                 if (shotsFired < 3) {
->>>>>>> 647c1856bef9c7ebe46d832bd0590cdc026bdefa
+
                     double elapsed = feederTimer.milliseconds();
 
                     if (elapsed < 300) {
@@ -360,7 +363,7 @@ public class teleop extends OpMode {
                     }
                 } else {
                     // All 3 shots done
-                    launchState = LaunchState.IDLE;
+                    launchState = LaunchState.LAUNCHING;
                     shotsFired = 0;
                 }
                 break;
