@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Constants {
-        double robotMass = 6.7
+        double robotMass = 6.7;
     public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
             .rightFrontMotorName("rightFront")
             .rightRearMotorName("rightRear")
@@ -29,8 +29,8 @@ public class Constants {
                     .rightRearMotorName("rightRear")
                     .leftRearMotorName("leftRear")
                     .leftFrontMotorName("leftFront")
-                    .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-                    .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+                    .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+                    .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
                     .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
                     .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
