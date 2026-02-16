@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Constants {
+        double robotMass = 6.7
     public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
             .rightFrontMotorName("rightFront")
             .rightRearMotorName("rightRear")
@@ -21,7 +22,7 @@ public class Constants {
             .rightFrontEncoderDirection(Encoder.FORWARD)
             .rightRearEncoderDirection(Encoder.FORWARD);
     public static FollowerConstants followerConstants = new FollowerConstants();
-            // .mass()
+            //.mass(robotMass);
             public static MecanumConstants driveConstants = new MecanumConstants()
                     .maxPower(1)
                     .rightFrontMotorName("rightFront")

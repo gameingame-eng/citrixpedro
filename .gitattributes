@@ -1,0 +1,24 @@
+# --- Set default behavior to automatically normalize line endings ---
+# This ensures text files use LF in the repo, but correct endings on checkout
+* text=auto
+
+# --- Ensure specific file types are treated as text/binary correctly ---
+*.java text
+*.xml text
+*.gradle text
+*.properties text
+*.md text
+.gitignore text
+.gitattributes text
+
+# Treat image files and binary assets as binary to prevent corruption
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.so binary
+
+# Gradle wrapper scripts should keep their executable bit and line endings
+gradlew text eol=lf
+gradlew.bat text eol=crlf

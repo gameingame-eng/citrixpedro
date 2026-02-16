@@ -15,7 +15,7 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.Dash.DashboardDrawingHandler;
 
-@Autonomous(name = "RedGoal12BallAuto", group = "Autonomous")
+@Autonomous(name = "RedGoal12BallAuto", group = "PEDROAUTO")
 public class twelveball extends LinearOpMode {
 
     private Follower follower;
