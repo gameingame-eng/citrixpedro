@@ -110,7 +110,7 @@ public class teleop extends OpMode {
      * We can use higher level code to cycle through these states. But this allows us to write
      * functions and autonomous routines in a way that avoids loops within loops, and "waits".
      */
-    private enum LaunchState {
+    enum LaunchState {
         IDLE,
         SPIN_UP,
         LAUNCH,
@@ -268,8 +268,7 @@ public class teleop extends OpMode {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         } else if (gamepad1.b) { // stop flywheel
             launcher.setVelocity(0);
-        }
-        else if (gamepad1.left_stick_button) {
+        } else if (gamepad1.left_stick_button) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
         /*
@@ -304,7 +303,7 @@ public class teleop extends OpMode {
     public void stop() {
     }
 
-    void mecanumDrive(double forward, double strafe, double rotate){
+    void mecanumDrive(double forward, double strafe, double rotate) {
 
         /* the denominator is the largest motor power (absolute value) or 1
          * This ensures all the powers maintain the same ratio,
@@ -340,44 +339,41 @@ public class teleop extends OpMode {
                 }
                 break;
             case LAUNCH:
-
                 if (shotsFired <= 3) {
+                    if (shotsFired < 3) {
+                        double elapsed = feederTimer.milliseconds();
 
+                        if (elapsed < 300) {
+                            // Phase 1: Extend feeder/Push ball
+                            leftFeeder.setPower(FULL_SPEED);
+                            rightFeeder.setPower(FULL_SPEED);
+                        } else if (elapsed < 600) {
+                            // Phase 2: Retract feeder/Wait for next ball
+                            leftFeeder.setPower(STOP_SPEED);
+                            rightFeeder.setPower(STOP_SPEED);
+                        } else {
+                            // Phase 3: One shot complete, reset timer for the next one
+                            shotsFired++;
+                            feederTimer.reset();
+                        }
+                    } else {
+                        // All 3 shots done
+                        launchState = LaunchState.LAUNCHING;
+                        shotsFired = 0;
+                    }
+                    break;
 
-                if (shotsFired < 3) {
-
-                    double elapsed = feederTimer.milliseconds();
-
-                    if (elapsed < 300) {
-                        // Phase 1: Extend feeder/Push ball
-                        leftFeeder.setPower(FULL_SPEED);
-                        rightFeeder.setPower(FULL_SPEED);
-                    } else if (elapsed < 600) {
-                        // Phase 2: Retract feeder/Wait for next ball
+                }
+                case LAUNCHING:
+                    if (feederTimer.seconds() > FEED_TIME_SECONDS) {
+                        launchState = LaunchState.IDLE;
                         leftFeeder.setPower(STOP_SPEED);
                         rightFeeder.setPower(STOP_SPEED);
-                    } else {
-                        // Phase 3: One shot complete, reset timer for the next one
-                        shotsFired++;
-                        feederTimer.reset();
                     }
-                } else {
-                    // All 3 shots done
-                    launchState = LaunchState.LAUNCHING;
-                    shotsFired = 0;
-                }
-                break;
-            case LAUNCHING:
-                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
-                    launchState = LaunchState.IDLE;
-                    leftFeeder.setPower(STOP_SPEED);
-                    rightFeeder.setPower(STOP_SPEED);
-                }
-                break;
+                    break;
         }
     }
 }
-
 
 
 
