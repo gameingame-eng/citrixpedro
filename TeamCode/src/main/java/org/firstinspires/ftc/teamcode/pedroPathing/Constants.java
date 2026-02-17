@@ -21,8 +21,8 @@ public class Constants {
             .leftRearEncoderDirection(Encoder.REVERSE)
             .rightFrontEncoderDirection(Encoder.FORWARD)
             .rightRearEncoderDirection(Encoder.FORWARD);
-    public static FollowerConstants followerConstants = new FollowerConstants();
-            //.mass(robotMass);
+    public static FollowerConstants followerConstants = new FollowerConstants()
+            .mass(15);
             public static MecanumConstants driveConstants = new MecanumConstants()
                     .maxPower(1)
                     .rightFrontMotorName("rightFront")
