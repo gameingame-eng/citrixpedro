@@ -74,6 +74,8 @@ public class teleop extends OpMode {
      */
     final double LAUNCHER_TARGET_VELOCITY = 1500;
     final double LAUNCHER_MIN_VELOCITY = 1400;
+    final double INTAKE_TARGET_VELOCITY = 100;
+
 
     // Declare OpMode members.
     private DcMotor leftFrontDrive = null;
@@ -81,7 +83,7 @@ public class teleop extends OpMode {
     private boolean Outtake = false;
     private boolean prevIntakeButtonX = false;
     private boolean prevOutTakeButtonA = false;
-    final double INTAKE_POWER = 0.85;
+    final double INTAKE_POWER = 0.9;
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
@@ -145,7 +147,7 @@ public class teleop extends OpMode {
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        //intakeFlywheel = hardwareMap.get(DcMotorEx.class, "wheelIntake");
+        intakeFlywheel = hardwareMap.get(DcMotorEx.class, "wheelIntake");
 
         /*
          * To drive forward, most robots need the motor on one side to be reversed,
@@ -268,8 +270,8 @@ public class teleop extends OpMode {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         } else if (gamepad1.b) { // stop flywheel
             launcher.setVelocity(0);
-        } else if (gamepad1.left_stick_button) {
-            launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
+        } else if (gamepad1.y) {
+            intakeFlywheel.setVelocity(INTAKE_TARGET_VELOCITY);
         }
         /*
          * Now we call our "Launch" function.
@@ -338,39 +340,20 @@ public class teleop extends OpMode {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
-            case LAUNCH:
-                if (shotsFired <= 3) {
-                    if (shotsFired < 3) {
-                        double elapsed = feederTimer.milliseconds();
+            case LAUNCH: {
+                leftFeeder.setPower(FULL_SPEED);
+                rightFeeder.setPower(FULL_SPEED);
+                launchState = LaunchState.LAUNCHING;
+            }
 
-                        if (elapsed < 300) {
-                            // Phase 1: Extend feeder/Push ball
-                            leftFeeder.setPower(FULL_SPEED);
-                            rightFeeder.setPower(FULL_SPEED);
-                        } else if (elapsed < 600) {
-                            // Phase 2: Retract feeder/Wait for next ball
-                            leftFeeder.setPower(STOP_SPEED);
-                            rightFeeder.setPower(STOP_SPEED);
-                        } else {
-                            // Phase 3: One shot complete, reset timer for the next one
-                            shotsFired++;
-                            feederTimer.reset();
-                        }
-                    } else {
-                        // All 3 shots done
-                        launchState = LaunchState.LAUNCHING;
-                        shotsFired = 0;
-                    }
-                    break;
 
+            case LAUNCHING:
+                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
+                    launchState = LaunchState.IDLE;
+                    leftFeeder.setPower(STOP_SPEED);
+                    rightFeeder.setPower(STOP_SPEED);
                 }
-                case LAUNCHING:
-                    if (feederTimer.seconds() > FEED_TIME_SECONDS) {
-                        launchState = LaunchState.IDLE;
-                        leftFeeder.setPower(STOP_SPEED);
-                        rightFeeder.setPower(STOP_SPEED);
-                    }
-                    break;
+                break;
         }
     }
 }
