@@ -346,7 +346,7 @@ public class teleop extends OpMode {
                 rightFeeder.setPower(FULL_SPEED);
                 launchState = LaunchState.LAUNCHING;
             }
-
+            //hi
 
             case LAUNCHING:
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
